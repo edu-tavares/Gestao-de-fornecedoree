@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  FORNECEDOR
+  ADMIN
+  CONTRATANTE_VIEWER
+}
+
+enum SupplierStatus {
+  PENDENTE
+  EM_ANALISE
+  APROVADO
+  REJEITADO
+}
+
+enum DocumentType {
+  CONTRATO_SOCIAL
+  CARTAO_CNPJ
+  CERTIDAO_NEGATIVA_FEDERAL
+  CERTIDAO_NEGATIVA_TRABALHISTA
+  COMPROVANTE_ENDERECO
+}
+
+enum AiAnalysisStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVIEW
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  supplierId String?   @unique
+  supplier   Supplier? @relation("SupplierUser", fields: [supplierId], references: [id])
+
+  reviewsGiven Supplier[] @relation("ReviewedBy")
+}
+
+model Supplier {
+  id              String         @id @default(cuid())
+  razaoSocial     String
+  nomeFantasia    String?
+  cnpj            String         @unique
+  email           String
+  telefone        String
+  endereco        String
+  cidade          String
+  estado          String
+  cep             String
+  status          SupplierStatus @default(PENDENTE)
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  reviewedAt   DateTime?
+  reviewedById String?
+  reviewedBy   User?     @relation("ReviewedBy", fields: [reviewedById], references: [id])
+
+  user      User?      @relation("SupplierUser")
+  documents Document[]
+  employees Employee[]
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  type     DocumentType
+  fileName String
+  filePath String
+  mimeType String
+  size     Int
+
+  uploadedAt DateTime @default(now())
+
+  aiStatus     AiAnalysisStatus @default(PENDING)
+  aiNotes      String?
+  aiConfidence Float?
+  aiAnalyzedAt DateTime?
+
+  @@unique([supplierId, type])
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  name     String
+  cpf      String
+  cargo    String
+  email    String?
+  telefone String?
+  active   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@unique([supplierId, cpf])
+}
