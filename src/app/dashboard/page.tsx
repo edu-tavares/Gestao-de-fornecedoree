@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/sign-out-button";
 import { DOCUMENT_TYPE_LABELS, REQUIRED_DOCUMENT_TYPES, SUPPLIER_STATUS_LABELS } from "@/lib/constants";
@@ -46,9 +47,17 @@ export default async function FornecedorDashboardPage() {
       )}
 
       <section className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-slate-900">
-          Documentos obrigatórios
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-900">
+            Documentos obrigatórios
+          </h2>
+          <Link
+            href="/documentos"
+            className="text-xs font-medium text-slate-900 underline"
+          >
+            Enviar documentos
+          </Link>
+        </div>
         <ul className="divide-y divide-slate-100">
           {REQUIRED_DOCUMENT_TYPES.map((type) => {
             const doc = documentsByType.get(type);
