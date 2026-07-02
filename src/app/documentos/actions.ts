@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import type { DocumentType } from "@/generated/prisma/enums";
+import { getAnalyzer } from "@/lib/ai";
 import { REQUIRED_DOCUMENT_TYPES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { saveUploadedFile } from "@/lib/storage";
@@ -66,6 +67,33 @@ export async function uploadDocument(
       uploadedAt: new Date(),
     },
   });
+
+  const analysis = await getAnalyzer().analyzeDocument({
+    filePath,
+    documentType: type,
+    mimeType: file.type,
+    fileSizeBytes: file.size,
+  });
+
+  await prisma.document.update({
+    where: { supplierId_type: { supplierId, type } },
+    data: {
+      aiStatus: analysis.status,
+      aiNotes: analysis.notes,
+      aiConfidence: analysis.confidence,
+      aiAnalyzedAt: new Date(),
+    },
+  });
+
+  const uploadedTypesCount = await prisma.document.count({
+    where: { supplierId, type: { in: REQUIRED_DOCUMENT_TYPES } },
+  });
+  if (uploadedTypesCount === REQUIRED_DOCUMENT_TYPES.length) {
+    await prisma.supplier.updateMany({
+      where: { id: supplierId, status: "PENDENTE" },
+      data: { status: "EM_ANALISE" },
+    });
+  }
 
   revalidatePath("/documentos");
   revalidatePath("/dashboard");

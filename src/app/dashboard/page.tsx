@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/sign-out-button";
-import { DOCUMENT_TYPE_LABELS, REQUIRED_DOCUMENT_TYPES, SUPPLIER_STATUS_LABELS } from "@/lib/constants";
+import {
+  AI_STATUS_LABELS,
+  AI_STATUS_STYLES,
+  DOCUMENT_TYPE_LABELS,
+  REQUIRED_DOCUMENT_TYPES,
+  SUPPLIER_STATUS_LABELS,
+} from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
 const STATUS_BADGE_STYLES = {
@@ -66,8 +72,10 @@ export default async function FornecedorDashboardPage() {
                 <span className="text-sm text-slate-700">
                   {DOCUMENT_TYPE_LABELS[type]}
                 </span>
-                <span className="text-xs font-medium text-slate-500">
-                  {doc ? doc.aiStatus : "Não enviado"}
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${doc ? AI_STATUS_STYLES[doc.aiStatus] : "bg-slate-100 text-slate-500"}`}
+                >
+                  {doc ? AI_STATUS_LABELS[doc.aiStatus] : "Não enviado"}
                 </span>
               </li>
             );

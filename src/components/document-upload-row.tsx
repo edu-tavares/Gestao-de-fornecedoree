@@ -3,20 +3,7 @@
 import { useActionState } from "react";
 import type { DocumentType, AiAnalysisStatus } from "@/generated/prisma/enums";
 import { uploadDocument } from "@/app/documentos/actions";
-
-const AI_STATUS_LABELS: Record<AiAnalysisStatus, string> = {
-  PENDING: "Analisando...",
-  APPROVED: "Aprovado pela IA",
-  REJECTED: "Rejeitado pela IA",
-  NEEDS_REVIEW: "Requer revisão",
-};
-
-const AI_STATUS_STYLES: Record<AiAnalysisStatus, string> = {
-  PENDING: "bg-slate-100 text-slate-600",
-  APPROVED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
-  NEEDS_REVIEW: "bg-amber-100 text-amber-800",
-};
+import { AI_STATUS_LABELS, AI_STATUS_STYLES } from "@/lib/constants";
 
 export function DocumentUploadRow({
   type,
