@@ -52,6 +52,15 @@ export default async function FornecedorDashboardPage() {
         </div>
       )}
 
+      {supplier.status === "APROVADO" && (
+        <div className="mb-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          Empresa homologada.{" "}
+          <Link href="/colaboradores" className="font-medium underline">
+            Cadastrar colaboradores
+          </Link>
+        </div>
+      )}
+
       <section className="rounded-lg border border-slate-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-slate-900">
